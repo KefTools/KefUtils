@@ -35,7 +35,7 @@ namespace KefUtils.IO
                 BlockfileSegment segment = new BlockfileSegment()
                 {
                     AssetGuid = new Guid(br.ReadBytes(16)),
-                    FilePath = BitConverter.ToString(br.ReadBytes((int)Header.PathLength)),
+                    FilePath = Encoding.ASCII.GetString(br.ReadBytes((int)Header.PathLength)).TrimEnd('\0'),
                     Offset = br.ReadUInt32(),
                     Length = br.ReadUInt32(),
                     Magic = br.ReadUInt32(),
@@ -62,7 +62,9 @@ namespace KefUtils.IO
 
                 bw.Write(Header.Version);
                 bw.Write(Header.Size);
+                bw.Write(Header.Unused);
                 bw.Write(Header.PathLength);
+                bw.Write(Header.Unused2);
                 bw.Write(Header.Magic);
 
                 foreach (BlockfileSegment segment in Segments)
