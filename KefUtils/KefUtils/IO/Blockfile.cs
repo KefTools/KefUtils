@@ -21,8 +21,10 @@ namespace KefUtils.IO
             Header = new BlockfileHeader()
             {
                 Version = br.ReadUInt32(),
-                Size = br.ReadUInt32(),
-                PathLength = br.ReadUInt32(),
+                Size = br.ReadUInt16(),
+                Unused = br.ReadUInt16(),
+                PathLength = br.ReadUInt16(),
+                Unused2 = br.ReadUInt16(),
                 Magic = br.ReadUInt32(),
             };
 
@@ -42,6 +44,8 @@ namespace KefUtils.IO
             }
 
             Segments = segments.ToArray();
+
+            br.ReadBytes(32);
 
             long bytesLeft = stream.Length - stream.Position;
             Data = br.ReadBytes((int)bytesLeft);
@@ -77,6 +81,8 @@ namespace KefUtils.IO
                     bw.Write(segment.Magic);
                 }
 
+                bw.Write(new byte[32]);
+
                 bw.Write(Data);
 
                 bw.Close();
@@ -91,13 +97,17 @@ namespace KefUtils.IO
             File.Move(tempPath, path);
         }
     }
-    public class BlockfileHeader { 
+    public class BlockfileHeader
+    {
         public uint Version { get; set; }
-        public uint Size { get; set; }
-        public uint PathLength { get; set; }
+        public ushort Size { get; set; }
+        public ushort Unused { get; set; }
+        public ushort PathLength { get; set; }
+        public ushort Unused2 { get; set; }
         public uint Magic { get; set; }
     }
-    public class BlockfileSegment { 
+    public class BlockfileSegment
+    {
         public Guid AssetGuid { get; set; }
         public string FilePath { get; set; }
         public uint Offset { get; set; }
